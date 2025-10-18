@@ -305,9 +305,10 @@ export const ChatProvider = ({ children }) => {
     const [messages, setMessages] = useState([]);
     const [chatList, setChatList] = useState([]);
     const [typingUser, setTypingUser] = useState(null);
+    const [pathname, setpath] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [deletedUsers, setDeletedUsers] = useState([]);
-
+    const [groupMessages, setGroupMessages] = useState([]); // { groupId: [msgs] }
     // ✅ incoming call states
     const [incomingCall, setIncomingCall] = useState(false);
     const [incomingUser, setIncomingUser] = useState("");
@@ -372,6 +373,8 @@ export const ChatProvider = ({ children }) => {
 
     // ✅ Handle incoming call
     useEffect(() => {
+
+        console.log(groupMessages)
         const handleIncomingCall = ({ from }) => {
             console.log("📞 Incoming call from:", from);
             setIncomingUser(from);
@@ -387,19 +390,81 @@ export const ChatProvider = ({ children }) => {
             setIncomingCall(false);
         };
 
+        const handleGroupMessage = (msg) => {
+            const groupId = msg.groupId || "default";
+
+            console.log(msg)// backend se aayega
+
+            setGroupMessages(prev => {
+                const prevMsgs = prev[groupId] || [];
+                return {
+                    ...prev,
+                    [groupId]: [...prevMsgs, msg]
+                };
+            });
+        };
+
 
 
         socket.on("incoming-call", handleIncomingCall);
         socket.on("call-accepted", handleCallAccepted);
         socket.on("call-rejected", handleCallRejected);
+        socket.on("groupmessage", handleGroupMessage);
 
         // Cleanup
         return () => {
             socket.off("incoming-call", handleIncomingCall);
             socket.off("call-accepted", handleCallAccepted);
             socket.off("call-rejected", handleCallRejected);
+            socket.off("groupmessage", handleGroupMessage);
+
         };
     }, [socket]);
+
+    // useEffect(() => {
+    //     // make sure groupId is sent inside joinGroup()
+
+    //     socket.on("groupmessage", (msg) => {
+    //         console.log(msg);
+
+    //         setGroupMessages(msg.text)
+
+    //         console.log('staus this ', groupMessages)
+
+
+    //         // const groupId = msg.groupId || "default"; // ya server se aayega
+
+    //         // setGroupMessages((prev) => {
+    //         //     const prevMsgs = prev[groupId] || [];
+    //         //     return { ...prev, [groupId]: [...prevMsgs, msg] };
+    //         // });
+    //     });
+
+    //     return () => socket.off("groupmessage");
+    // }, []);
+
+
+
+    const joinGroup = (groupId) => {
+        socket.emit("joinGroup", { groupId, username: myUsername });
+    };
+
+    // ✅ Leave group
+    const leaveGroup = (groupId) => {
+        socket.emit("leaveGroup", { groupId, username: myUsername });
+        setGroupMessages((prev) => ({ ...prev, [groupId]: [] }));
+    };
+
+    const sendGroupMessage = (id, myUsername, input) => {
+
+
+        // if (!text) return;
+        socket.emit("groupMessage", { groupId: id, username: myUsername, text: input });
+        setGroupMessages((prev) => {
+            const prevMsgs = prev[id] || [];
+            return { ...prev, [id]: [...prevMsgs, { username: myUsername, input, timestamp: new Date().toISOString() }] };
+        });
+    };
 
 
     // ✅ Handle incoming message
@@ -563,7 +628,13 @@ export const ChatProvider = ({ children }) => {
                 clearAll,
                 isPremium,
                 updatePremium,
+                sendGroupMessage,
+                joinGroup,
+
+                groupMessages,
                 premiumExpiry,
+                setpath,
+                pathname
             }}
         >
             {children}

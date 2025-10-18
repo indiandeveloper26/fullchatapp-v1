@@ -91,6 +91,19 @@ import "./globals.css";
 import { ChatProvider } from "./context/chatcontext";
 import ReduxProvider from "./rtk/reduxprovider";
 import IncomingCall from "./calling/page";
+import Layoutbar from "./component/layoutbar";
+import ChatVerticalLayout from "./component/layoutbar";
+import ChatSidebarLayout from "./component/layoutbar";
+import WhatsApplayout from "./dummy/layoutt";
+
+
+
+
+
+
+
+
+
 // ✅ aapka context import
 
 const geistSans = Geist({
@@ -113,10 +126,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* ✅ Yaha wrap karna hota hai */}
-
-
-
+        <WhatsApplayout />
         <ChatProvider>
+
           {children}
           <IncomingCall />
         </ChatProvider>

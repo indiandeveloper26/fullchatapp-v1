@@ -5,8 +5,8 @@ import axios from 'axios';
 
 // ✅ Axios instance banao
 const api = axios.create({
-    // baseURL: 'http://10.95.139.92:4000', // yahan apna base URL daal
-    baseURL: 'https://chat-app-server-render-v-1.onrender.com', // yahan apna base URL daal
+    baseURL: 'http://10.64.71.92:4000', // yahan apna base URL daal
+    // baseURL: 'https://chat-app-server-render-v-1.onrender.com', // yahan apna base URL daal
 
     // baseURL: 'https://firebase-chat-app-v-8-3.onrender.com', // yahan apna base URL daal
     timeout: 5000,
