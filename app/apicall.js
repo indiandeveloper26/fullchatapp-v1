@@ -4,12 +4,24 @@ import axios from 'axios';
 
 
 // ✅ Axios instance banao
-const api = axios.create({
-    // baseURL: 'https://calculator-chatapp-server-v-2.onrender.com', // yahan apna base URL daal
-    baseURL: 'http://10.174.17.92:4000', // yahan apna base URL daal
+// const api = axios.create({
+//     // baseURL: 'https://calculator-chatapp-server-v-2.onrender.com', // yahan apna base URL daal
+//     baseURL: 'http://10.232.240.92:4000', //
+//     //  yahan apna base URL daal
 
-    // baseURL: 'https://firebase-chat-app-v-8-3.onrender.com', // yahan apna base URL daal
+//     // baseURL: 'https://firebase-chat-app-v-8-3.onrender.com', // yahan apna base URL daal
+//     timeout: 5000,
+//     withCredentials: true,
+//     credentials: 'include'
+// });
+
+
+
+const api = axios.create({
+    baseURL: 'https://chat-app-server-render-v-1.onrender.com',
     timeout: 5000,
+    withCredentials: true,  // 👈 ye important hai cookies bhejne ke liye
+    credentials: 'include'  // 👈 ye bhi include kare browser ke liye
 });
 
 // ✅ Request interceptor: Har request mein token lagana hai to

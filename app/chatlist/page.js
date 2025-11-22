@@ -8,106 +8,111 @@
 "use client";
 
 import React, { useEffect, useState, useContext } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChatContext } from "../context/chatcontext";
 
 export default function ChatList() {
-    const router = useRouter();
-    const [username, setUsername] = useState("");
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
 
-    const { visibleChats = [], onlineUsers = [], addToDeletedUsers } = useContext(ChatContext);
+  const pathname = usePathname();
+  console.log('pathname', pathname)
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-    useEffect(() => {
-        const savedName = localStorage.getItem("username");
-        if (savedName) setUsername(savedName);
-    }, []);
+  const { visibleChats = [], onlineUsers = [], addToDeletedUsers } = useContext(ChatContext);
 
-    const openChat = (item) => {
-        if (!item?.adduser) return;
-        router.push(`/chatlist/${item.adduser}`);
-    };
+  useEffect(() => {
+    const savedName = localStorage.getItem("username");
+    if (savedName) setUsername(savedName);
+  }, []);
 
-    const confirmDelete = (user) => {
-        setSelectedUser(user);
-        setModalVisible(true);
-    };
+  const openChat = (item) => {
+    if (!item?.adduser) return;
+    router.push(`/chatlist/${item.adduser}`);
+  };
 
-    const handleDelete = () => {
-        addToDeletedUsers?.(selectedUser);
-        setModalVisible(false);
-        setSelectedUser(null);
-    };
+  const confirmDelete = (user) => {
+    setSelectedUser(user);
+    setModalVisible(true);
+  };
 
-    return (
-        <div className="container">
-            <div className="chat-list">
-                {visibleChats.length === 0 && (
-                    <p className="empty-text">No chats yet. Start chatting!</p>
-                )}
+  const handleDelete = () => {
+    addToDeletedUsers?.(selectedUser);
+    setModalVisible(false);
+    setSelectedUser(null);
+  };
 
-                {visibleChats.map((item) => {
-                    const user = item.adduser || "Unknown";
-                    const firstLetter = user.charAt(0).toUpperCase();
-                    const isOnline = onlineUsers.includes(user);
+  return (
+    <div className="container">
+      <div className="chat-list">
+        {visibleChats.length === 0 && (
+          <p className="empty-text">No chats yet. Start chatting!</p>
+        )}
 
-                    return (
-                        <div key={user} className="chat-item">
-                            <div className="chat-left" onClick={() => openChat(item)}>
-                                <div className="avatar">
-                                    <span className="avatar-text">{firstLetter}</span>
-                                    <span
-                                        className={`online-dot ${isOnline ? "online" : "offline"}`}
-                                    />
-                                </div>
-                                <div className="chat-text">
-                                    <p className="username">{user}</p>
-                                    <p className="last-message">{item.lastMessage || "Say hi!"}</p>
-                                </div>
-                                {item.unreadCount > 0 && (
-                                    <div className="unread-badge">{item.unreadCount}</div>
-                                )}
-                            </div>
+        {visibleChats.map((item) => {
+          const user = item.adduser || "Unknown";
+          const firstLetter = user.charAt(0).toUpperCase();
+          const isOnline = onlineUsers.includes(user);
 
-                            <button className="options-button" onClick={() => confirmDelete(user)}>
-                                ⋮
-                            </button>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Sticky New Chat Button */}
-            <button className="sticky-button" onClick={() => router.push("/payment")}>
-                💬
-            </button>
-
-            {/* Delete Modal */}
-            {modalVisible && (
-                <div className="modal-overlay" onClick={() => setModalVisible(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h3>Delete Chat</h3>
-                        <p>Are you sure you want to delete chat with {selectedUser}?</p>
-                        <div className="modal-buttons">
-                            <button className="cancel-button" onClick={() => setModalVisible(false)}>
-                                Cancel
-                            </button>
-                            <button className="delete-button" onClick={handleDelete}>
-                                Delete
-                            </button>
-                        </div>
-                    </div>
+          return (
+            <div key={user} className="chat-item">
+              <div className="chat-left" onClick={() => openChat(item)}>
+                <div className="avatar">
+                  <span className="avatar-text">{firstLetter}</span>
+                  <span
+                    className={`online-dot ${isOnline ? "online" : "offline"}`}
+                  />
                 </div>
-            )}
+                <div className="chat-text">
+                  <p className="username">{user}</p>
+                  <p className="last-message">{item.lastMessage || "Say hi!"}</p>
+                </div>
+                {item.unreadCount > 0 && (
+                  <div className="unread-badge">{item.unreadCount}</div>
+                )}
+              </div>
 
-            {/* <AnimatedAdsScreen /> */}
-            <style jsx>{`
+              <button className="options-button" onClick={() => confirmDelete(user)}>
+                ⋮
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Sticky New Chat Button */}
+      <button className="sticky-button" onClick={() => router.push("/payment")}>
+        💬
+      </button>
+
+      {/* Delete Modal */}
+      {modalVisible && (
+        <div className="modal-overlay" onClick={() => setModalVisible(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Chat</h3>
+            <p>Are you sure you want to delete chat with {selectedUser}?</p>
+            <div className="modal-buttons">
+              <button className="cancel-button" onClick={() => setModalVisible(false)}>
+                Cancel
+              </button>
+              <button className="delete-button" onClick={handleDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* <AnimatedAdsScreen /> */}
+      <style jsx>{`
         .container {
           padding: 12px;
           background-color: #121212;
           min-height: 100vh;
+          
           position: relative;
+          width:  100vw;
         }
         .chat-list {
           display: flex;
@@ -247,6 +252,6 @@ export default function ChatList() {
           margin-top: 20px;
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }

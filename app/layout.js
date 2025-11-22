@@ -88,7 +88,6 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ChatProvider } from "./context/chatcontext";
 import ReduxProvider from "./rtk/reduxprovider";
 import IncomingCall from "./calling/page";
 
@@ -96,6 +95,8 @@ import WhatsApplayout from "./dummy/layoutt";
 
 import ClientLayout from "./component/ClientLayout";
 import WhatsAppLayout from "./component/whatsaplayout";
+import { ChatProvider } from "./context/chatcontext";
+
 
 
 
@@ -123,6 +124,10 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
+
+
+
 
   return (
     <html lang="en">

@@ -15,10 +15,11 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   images: {
     domains: ['placekitten.com'], // yahan external image domains add karo
   },
+
   /* config options here */
 }
 

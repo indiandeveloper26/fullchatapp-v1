@@ -1337,6 +1337,7 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from "react";
 import socket from "../socket";
 import api from "../apicall";
+import { useRouter } from "next/navigation";
 
 export const ChatContext = createContext();
 
@@ -1347,6 +1348,7 @@ export const ChatProvider = ({ children }) => {
     const [typingUser, setTypingUser] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [deletedUsers, setDeletedUsers] = useState([]);
+    const [layouthide, setlayouthide] = useState(true)
     const [isPremium, setIsPremium] = useState(false);
     const [premiumExpiry, setPremiumExpiry] = useState(null);
     const [login, setLogin] = useState(false);
@@ -1359,6 +1361,9 @@ export const ChatProvider = ({ children }) => {
 
     const typingTimeoutRef = useRef(null);
 
+
+    let ruter = useRouter()
+
     // ✅ UUID generator
     const uuidv4 = () =>
         "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -1369,11 +1374,13 @@ export const ChatProvider = ({ children }) => {
 
     // ✅ Initialize user and socket
     useEffect(() => {
+
+        console.log('socket conet hua name se')
         if (!socket.connected) socket.connect();
 
         const name = localStorage.getItem("username");
-        if (name) {
-            setMyUsername(name);
+        if (myUsername) {
+            setMyUsername(myUsername);
             setLogin(true);
             socket.emit("setUsername", name);
 
@@ -1388,7 +1395,7 @@ export const ChatProvider = ({ children }) => {
                 console.error("LocalStorage parsing error:", err);
             }
         }
-    }, []);
+    }, [myUsername]);
 
     // ✅ Fetch userdata from API
     useEffect(() => {
@@ -1437,6 +1444,8 @@ export const ChatProvider = ({ children }) => {
     // ✅ Online/offline status
     useEffect(() => {
         const handleStatus = ({ username, online }) => {
+
+            console.log('useronline', username)
             setOnlineUsers((prev) => {
                 const filtered = prev.filter((u) => u !== username);
                 return online ? [...filtered, username] : filtered;
@@ -1448,10 +1457,11 @@ export const ChatProvider = ({ children }) => {
 
     // ✅ Incoming call listeners
     useEffect(() => {
-        const handleIncomingCall = ({ from }) => {
-            console.log("📞 Incoming call from:", JSON.stringify(from));
-            setIncomingUser(from);
+        const handleIncomingCall = ({ from, type, to }) => {
+            // console.log("📞 Incoming call from:", JSON.stringify(type));
+            setIncomingUser({ from, type, to });
             setIncomingCall(true);
+            console.log('incoming call ka', from)
         };
 
         const handleCallAccepted = ({ from }) => {
@@ -1461,9 +1471,14 @@ export const ChatProvider = ({ children }) => {
         };
 
         const handleCallRejected = ({ from }) => {
-            console.log("❌ Call rejected bbby:");
+            console.log("❌ Call rejected kiya gya:", JSON.stringify(from));
             setIncomingCall(false);
             setAcceptedCall(false);
+
+            // alert('ja chia fir se ')
+            ruter.push(`/chatlist/${from}`);
+            // ruter.push('login')
+
         };
 
         socket.on("incoming-call", handleIncomingCall);
@@ -1504,6 +1519,8 @@ export const ChatProvider = ({ children }) => {
 
     // ✅ Handle incoming private messages
     const handleIncomingMessage = useCallback((msg) => {
+
+        console.log('messs', msg)
         if (!msg.id) return;
         const { from, to, message, type } = msg;
         const otherUser = from === myUsername ? to : from;
@@ -1658,6 +1675,8 @@ export const ChatProvider = ({ children }) => {
                 // 📞 added call functions
                 callUser,
                 acceptCall,
+                layouthide,
+                setlayouthide,
                 rejectCall,
             }}
         >

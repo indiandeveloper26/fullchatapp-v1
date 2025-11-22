@@ -4,6 +4,8 @@ import React, { useState, useContext } from "react";
 import Image from "next/image";
 import { ChatContext } from "../context/chatcontext";
 import api from "../apicall";
+import { useRouter } from "next/navigation";
+
 
 export default function SignupPage() {
     const [username, setUsername] = useState("");
@@ -14,7 +16,11 @@ export default function SignupPage() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
-    const { setMyUsername, updatePremium, setlogin } = useContext(ChatContext);
+    const { setMyUsername, updatePremium,
+        setLogin, } = useContext(ChatContext);
+
+
+    let router = useRouter()
 
     // Validation
     const validate = () => {
@@ -40,7 +46,9 @@ export default function SignupPage() {
             const { data } = await api.post("/singup", {
                 username: lowerUsername,
                 password,
+                withCredentials: true
             });
+            console.log('dta', data)
 
             if (data.token) localStorage.setItem("tokenn", data.token);
             if (data.user?.username) {
@@ -57,7 +65,9 @@ export default function SignupPage() {
             }
 
             alert("✅ Signup successful! You got 2 days premium!");
-            setlogin(true);
+            router.push('chatlist')
+
+            setLogin(true);
         } catch (error) {
             console.error(error);
             alert("❌ Signup failed, please try again!");
